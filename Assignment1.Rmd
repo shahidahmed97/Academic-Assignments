@@ -1,0 +1,238 @@
+---
+title: "DSCI ASSIGNMENT 1"
+author: "Shahid Ahmed 300343355"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+Question 1: Give a clear, comprehensive one sentence summary of the difference between A.I. and Machine Learning.
+
+Solution 1: A.I. is where an user provides a given set of rules to the computer, so whenever an A.I. is provided with data, it knows which output to provide whereas in Machine Learning, the data is provided to the computer to allow it to learn the rules for itself.
+
+\newpage 
+
+Question 2: Using Fig 1.1 inspiration, create a diagram of another algorithm consisting of *at least three steps*, and including *at least one* "yes/no" switch (i.e. choice). Bonus marks may be given particularly interesting, unique, and engaging examples.
+
+Solution 2: 
+
+![](Assign1image.jpg)
+
+\newpage
+
+Question 3: List three differences between using R and using Python for Machine Learning. List *at least* two examples of each.
+
+Solution 3: 
+
+![](Assign1image2.png)
+
+
+
+Question 4: State what the 'iwalk' function does. Write a detailed explanation and provide an R example of its use, that is NOT in the book.
+
+Answer 4: The 'iwalk' function allows to use a single variable, storing the output path in the names. It also reads each of the .csv files just written to disk into R's global environment as a data frames. It uses each file's name (without the .csv extension) as name for its data frame.
+
+For example, here I have used a '.x' to reference the list element I'm iterating over and '.y' to reference its name.
+
+temp <- tempfile()
+
+dir.create(temp)
+
+cyls <- split(mtcars, mtcars$cyl)
+
+names(cyls) <- file.path(temp, paste0("cyl-", names(cyls), ".csv"))
+
+iwalk(cyls, ~write.csv(.x,.y))
+
+
+\
+\
+
+
+Question 5: 
+
+
+```{r}
+
+data <- read.csv("C:/Users/shahi/Desktop/Assign1.csv")
+
+
+print(data)
+
+
+```
+
+
+
+
+
+\newpage
+
+Question 6: Find the (Euclidean) distance between the 7th observation, and all the other observations 1 through 6, and then use k=3 to determine what label observation 7 receives
+
+Solution 6: 
+
+
+
+```{r, warning=FALSE}
+
+data <- read.csv("C:/Users/shahi/Desktop/Assign1.csv")
+
+data1 <- data.frame(data$V1, data$V2)
+
+set.seed(123)
+
+for( i in 1: nrow(data1)){
+  data1$data.V1N[i] <- (data1$data.V1[i] - mean(data1$data.V1))/sd(data1$data.V1)
+}
+
+for( i in 1: nrow(data1)){
+  data1$data.V2N[i] <- (data1$data.V2[i] - mean(data1$data.V2))/sd(data1$data.V2)
+}
+
+data1$data.V1N <- scale(data1$data.V1)
+
+data1$data.V2N <- scale(data1$data.V2)
+
+data1$data.V1N <- format(round(data1$data.V1N, 2))
+
+data1$data.V2N <- format(round(data1$data.V2N, 2))
+
+
+
+dataeuclidean <- data.frame(cbind(data1[1:2],
+                                  apply(data1[3:4], MARGIN = 2, function(x) as.numeric(x))))
+
+eucdata <- dist(dataeuclidean, method = "euclidean", upper = TRUE)
+
+
+
+
+print(eucdata)
+
+
+```
+
+Two out of three nearest neighbors has label red, so the class of label 7 is Red.
+
+
+\newpage
+
+
+Question 7: Find the Manhattan distance between the 7th Observation, and all the other observations 1 through 6, and then use k =3 to determine what label observation 7 receives
+
+
+```{r, warning=FALSE}
+
+
+
+datamanhattan <- data.frame(cbind(data1[1:2],
+                                  apply(data1[3:4], MARGIN = 2, function(x) as.numeric(x))))
+
+mandata <- dist(datamanhattan, method = "manhattan", upper = TRUE)
+
+print(mandata)
+
+```
+
+Two out of three nearest neighbors has label blue, so the class of label 7 is Blue.
+
+\
+\
+
+
+Question 8: Find the Max distance between the 7th observation, and all the other observations 1 through 6, and then use k =3 to determine what label observation 7 receives
+
+
+
+```{r, warning=FALSE}
+
+datamaximum <- data.frame(cbind(data1[1:2],
+                                  apply(data1[3:4], MARGIN = 2, function(x) as.numeric(x))))
+
+maxdata <- dist(datamaximum, method = "maximum", upper = TRUE)
+
+print(maxdata)
+
+```
+
+Two out of three nearest neighbors has label red, so the class of label 7 is Red.
+\newpage
+
+Question 9: Research or design ***a distance function***, or possibly transform the data, to find the distance between rows if our data looks like this:
+
+```{r, warning=FALSE}
+Observation <- c(1:6)
+
+V1 <- c(3,5,4,6,9,5)
+
+V2 <- c("a", "b","a", "c", "b", "a")
+
+label <- c("Red","Red", "Blue", "Blue", "Red", "Blue")
+
+data2 <- data.frame(Observation, V1, V2, label)
+
+print(data2)
+
+
+distfunc <- function(data2){
+  
+ dist(data2, method = "euclidean")
+  
+}
+
+print(distfunc(data2))
+
+
+```
+
+
+Question 10: Design a distance function that can handle data that looks like the below - you may wish to consider a *matching* distance idea: 
+
+Solution 10: For this type of data, we can use a matching distance function such as Jaccard Coefficient. Jaccard Coefficient measures similarity between observations when variables are categorical, encoded as 0-1 (or dummy variables). The benefit of using Jaccard Coefficient is that it does not count matching 0 values. There is another possible function that can handle this type of data which is Euclidean distance. 
+For example, the Euclidean distance between two observations can be mesaures by:
+
+**sqrt((V1(1)- V1(2))^2 + (V2(1) - V2(2)^2))
+
+
+\newpage 
+
+Question 11: Using your distance function above, generate the distance matrix for the above data.
+
+Solution: As per me, to generate the distance matrix, we first need to compare each observation with every other observation and calculate their Euclidean distance using the formula described above. The outcome would be a distance matrix which will be a square matrix with the dimensions equal to the number of observations given in a particular dataframe. In this case, the dataframe has 6 observations. So, it will have a distance matrix of 6X6. 
+
+\ 
+\
+
+
+Question 12: In general, a data frame of 200,000 rows, and 250 features will have a distance matrix of
+what dimensions?
+
+Solution 12: I think, in general, a data frame of 200,000 rows, and 250 features will have a distance matrix with dimensions of 200,000 x 200,000. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
